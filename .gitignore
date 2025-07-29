@@ -1,0 +1,72 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Django
+*.log
+*.pot
+*.py[cod]
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static/
+local_settings.py
+
+# Virtual Environments
+.env
+venv/
+env/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+*.pid
+*.seed
+*.bak
+*.old
+logs/
+volumes/
+
+# Nginx
+nginx/conf.d/*.conf~
+nginx/logs/
+
+# PostgreSQL
+*.sql
+*.dump
+*.backup
+pgdata/
+
+# Coverage / Testing
+htmlcov/
+.tox/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+test-results/
+
+# Node / Frontend (if using React/Vite in same repo)
+node_modules/
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,61 @@
+networks:
+  app_net:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:16
+    container_name: strategy_db
+    restart: always
+    env_file:
+        - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [app_net]
+
+  web:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.prod
+    container_name: strategy_web
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db: { condition: service_healthy }
+    entrypoint: ["/app/entrypoint.prod.sh"]
+    command:
+      - gunicorn
+      - config.wsgi:application
+      - --bind=0.0.0.0:8000
+      - --timeout=120
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - ../media:/usr/src/app/media:rw
+      - ../backups:/usr/src/app/backups:rw
+    expose: ["8000"]
+    networks: [app_net]
+
+  nginx:
+    build: ./nginx
+    container_name: strategy_nginx
+    restart: always
+    depends_on: [ web ]
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT}:80"
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - ../media:/usr/src/app/media:ro
+      - ../backups:/usr/src/app/backups:ro
+    networks: [ app_net ]
+
+volumes:
+  postgres_data:
+  static_volume:

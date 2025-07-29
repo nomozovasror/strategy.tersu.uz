@@ -1,0 +1,41 @@
+networks:
+  app_net:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:16
+    container_name: strategy_db
+    env_file:
+        - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [app_net]
+
+  web:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    container_name: strategy_web
+    ports:
+      - "${DJANGO_PORT}:${DJANGO_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    entrypoint: ["/app/entrypoint.sh"]
+    command:
+      - python
+      - manage.py
+      - runserver
+      - 0.0.0.0:${DJANGO_PORT}
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - ../media:/usr/src/app/media:rw
+      - ../backups:/usr/src/app/backups:rw
+    expose: ["${DJANGO_PORT}"]
+    networks: [app_net]
+
+volumes:
+  postgres_data:
+  static_volume:
